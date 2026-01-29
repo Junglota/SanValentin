@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>¿San Valentín?</title>
+  <style>
+
+    #typeTitle{
+  margin: 4px 0 8px;
+  font-size: clamp(24px, 4vw, 40px);
+}
+
+.cursor{
+  display:inline-block;
+  width: 10px;
+  margin-left: 4px;
+  animation: blink .8s infinite;
+  opacity: 1;
+}
+
+@keyframes blink{
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+    :root { --pad: 18px; }
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: radial-gradient(circle at 20% 20%, #fff, #f3f3ff);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:#111;
+      overflow:hidden;
+    }
+    .card{
+      width:min(720px, calc(100vw - 32px));
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 16px 50px rgba(0,0,0,.12);
+      text-align:center;
+      backdrop-filter: blur(6px);
+    }
+    h1{ margin: 4px 0 8px; font-size: clamp(24px, 4vw, 40px); }
+    p{ margin: 0 0 14px; opacity:.9; }
+
+    .memes{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin: 12px 0 18px;
+    }
+    .meme{
+      width: 150px; height: 110px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: linear-gradient(135deg, #ffe6ff, #e7fff4);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 44px;
+      position:relative;
+      overflow:hidden;
+    }
+    .meme span{
+      position:absolute;
+      bottom:8px; left:10px; right:10px;
+      font-size: 12px;
+      background: rgba(0,0,0,.55);
+      color:#fff;
+      padding:6px 8px;
+      border-radius: 10px;
+      text-align:left;
+    }
+
+    .arena{
+      position:relative;
+      width:min(640px, calc(100vw - 60px));
+      height: 280px;
+      margin: 0 auto;
+      border-radius: 16px;
+      border: 1px dashed rgba(0,0,0,.18);
+      background: rgba(250,250,255,.6);
+      overflow:hidden;
+    }
+
+    .btn{
+      border:0;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 16px;
+      cursor:pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,.12);
+      transition: transform .15s ease, left .15s ease, top .15s ease;
+      user-select:none;
+      position:absolute;
+      min-width: 120px;
+      
+    }
+    .btn:active{ transform: scale(.98); }
+
+    #yes{
+      left: 22%;
+      top: 62%;
+      background: #20c997;
+      color: #052014;
+      font-weight: 700;
+    }
+    #no{
+      left: 56%;
+      top: 62%;
+      background: #ff4d6d;
+      color: #2b020a;
+      font-weight: 800;
+    }
+
+    .footer{
+      margin-top: 14px;
+      font-size: 12px;
+      opacity:.7;
+    }
+
+    /* Mensaje final */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.45);
+      padding: 18px;
+    }
+    .modal{
+      width:min(520px, 100%);
+      background:#fff;
+      border-radius: 18px;
+      padding: 18px;
+      text-align:center;
+      box-shadow: 0 25px 80px rgba(0,0,0,.25);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .modal h2{ margin: 6px 0 10px; }
+    .modal .big{ font-size: 52px; }
+    .modal button{
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 0;
+      cursor:pointer;
+      background:#111;
+      color:#fff;
+      
+    }
+
+    .card{
+  position: relative; /* IMPORTANTE para centrar el título con absolute */
+  overflow: hidden;
+}
+
+/* El título arranca centrado en el medio del card */
+#titleWrap{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-align: center;
+  transition: top .55s ease, transform .55s ease;
+  pointer-events: none;
+}
+
+/* Cuando termina: el título se va arriba */
+.card.revealed #titleWrap{
+  top: 0%;
+  transform: translate(-50%, 0);
+}
+
+/* Ocultar al inicio memes/arena */
+.hidden{
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+}
+
+/* Mostrar gradualmente */
+.show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity .7s ease, transform .7s ease;
+}
+
+/* Para que al mostrarse se animen suave */
+.memes, .arena{
+  transition: opacity .7s ease, transform .7s ease;
+}
+  </style>
+</head>
+<body>
+  <div class="card">
+
+        <div id="titleWrap">
+        <h1 id="typeTitle"></h1>
+        </div>
+
+        <div></div>
+    <div class="memes hidden">
+      <div ><img src="https://media.tenor.com/xxPgBuwmddQAAAAi/cat.gif"></div>
+    </div>
+
+    <div class="arena hidden" id="arena">
+        <button class="btn" id="no">No 💔</button>
+        <button class="btn" id="yes">Sí 💚</button>
+    </div>
+
+    <!-- <div class="footer">PD: esto es un contrato legal felino (es broma… o no).</div> -->
+  </div>
+<div>
+</div>
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="big">🎉😻💘</div>
+      <h2>¡Sabía que dirías que sí!</h2>
+      <p>Ahora oficialmente eres mi San Valentín.  
+         (Los gatos lo aprobaron por unanimidad.)</p>
+      <button id="close">Ok, mi amor 🐾</button>
+    </div>
+  </div>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const btnNo = document.getElementById("no");
+    const btnYes = document.getElementById("yes");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("close");
+    let noScale = 1;
+    let yesScale = 1;
+
+    const card = document.querySelector(".card");
+const memesEl = document.querySelector(".memes");
+const arenaEl = document.getElementById("arena");
+
+function revealUI() {
+  // Mueve el título arriba
+  card.classList.add("revealed");
+
+  // Muestra memes y arena con fade-in
+  memesEl.classList.remove("hidden");
+  arenaEl.classList.remove("hidden");
+
+  // Forzar reflow para que la transición siempre dispare
+  void memesEl.offsetWidth;
+
+  memesEl.classList.add("show");
+  arenaEl.classList.add("show");
+}
+
+    // ✅ ESTA ES LA VARIABLE STRING DEL TEXTO ANIMADO:
+const typeTextList = [
+  "Hola... tengo algo que decirte",
+  "Tengo una pregunta importante...",
+  "Muy importante...",
+  "Angela Maria Peralta Mora",
+  "Te casari-",
+  "Digo",
+  "¿Quieres ser mi San Valentín? 💘"
+];
+
+// Configuración
+const typeSpeedMs = 55;
+const deleteSpeedMs = 35;
+const pauseAfterTypeMs = 1200;
+const pauseAfterDeleteMs = 400;
+
+const typeEl = document.getElementById("typeTitle");
+
+// Cursor
+const cursor = document.createElement("span");
+cursor.className = "cursor";
+cursor.textContent = "|";
+typeEl.appendChild(cursor);
+
+let textIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+
+function typeLoop() {
+  const currentText = typeTextList[textIndex];
+  const isLastText = textIndex === typeTextList.length - 1;
+
+  if (!isDeleting) {
+    // ESCRIBIENDO
+    if (charIndex < currentText.length) {
+      cursor.insertAdjacentText("beforebegin", currentText.charAt(charIndex));
+      charIndex++;
+      setTimeout(typeLoop, typeSpeedMs);
+    } else {
+      // TEXTO COMPLETO
+      if (isLastText) {
+        revealUI();
+        return;
+      }
+      setTimeout(() => {
+        isDeleting = true;
+        typeLoop();
+      }, pauseAfterTypeMs);
+    }
+  } else {
+    // BORRANDO
+    if (charIndex > 0) {
+      typeEl.childNodes[typeEl.childNodes.length - 2]?.remove();
+      charIndex--;
+      setTimeout(typeLoop, deleteSpeedMs);
+    } else {
+      // SIGUIENTE TEXTO
+      isDeleting = false;
+      textIndex++;
+      setTimeout(typeLoop, pauseAfterDeleteMs);
+    }
+  }
+}
+
+// Iniciar animación
+setTimeout(typeLoop, 300);
+
+    // Devuelve un número aleatorio entre min y max
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    function moveNoButton() {
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect = btnNo.getBoundingClientRect();
+
+      // límites para que el botón no se salga del contenedor
+      const padding = 10;
+      const maxLeft = arenaRect.width - btnRect.width - padding;
+      const maxTop  = arenaRect.height - btnRect.height - padding;
+
+      const newLeft = rand(padding, Math.max(padding, maxLeft));
+      const newTop  = rand(padding, Math.max(padding, maxTop));
+
+      btnNo.style.left = newLeft + "px";
+      btnNo.style.top  = newTop + "px";
+    }
+
+    // Escapa al pasar el mouse (PC)
+    btnNo.addEventListener("mouseenter", moveNoButton);
+
+btnNo.addEventListener("click", () => {
+  const delta = 0.15;
+
+  // NO se hace más pequeño
+  noScale -= delta;
+  if (noScale < 0.3) noScale = 0.3;
+
+  // SÍ se hace más grande (misma proporción)
+  yesScale += delta;
+
+  btnNo.style.transform = `scale(${noScale})`;
+  btnYes.style.transform = `scale(${yesScale})`;
+
+  // humillación extra
+  setTimeout(moveNoButton, 50);
+});
+
+    // En móvil/tablet, también escapa al intentar tocarlo
+    btnNo.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    // Al decir que sí: mostrar modal
+    btnYes.addEventListener("click", () => {
+      overlay.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      overlay.style.display = "none";
+    });
+
+    // Bonus: si le das click al fondo del overlay, se cierra
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.style.display = "none";
+    });
+  </script>
+</body>
+</html>
